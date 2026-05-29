@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>设备共享管理页 - 交互 Demo</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, "MiSans", "PingFang SC", sans-serif; background: #f5f5f5; display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; padding: 20px; }
+.phone-frame { width: 392px; height: 844px; background: #fff; border-radius: 44px; overflow: hidden; position: relative; box-shadow: 0 20px 60px rgba(0,0,0,0.15); border: 8px solid #1a1a1a; }
+.screen { width: 100%; height: 100%; overflow: hidden; position: relative; }
+
+/* Status Bar */
+.status-bar { display: flex; justify-content: space-between; align-items: center; padding: 14px 24px 0; font-size: 14px; font-weight: 600; }
+.status-bar .time { font-size: 16px; font-weight: 700; }
+.status-bar .icons { display: flex; gap: 4px; align-items: center; }
+.status-bar .icons svg { width: 18px; height: 18px; }
+
+/* Nav Bar */
+.nav-bar { display: flex; align-items: center; padding: 16px 16px 12px; }
+.nav-bar .back { font-size: 20px; color: #000; cursor: pointer; padding: 4px 8px; text-decoration: none; }
+.nav-bar .title { flex: 1; text-align: center; font-size: 18px; font-weight: 600; color: #000; }
+.nav-bar .edit { font-size: 18px; padding: 4px 8px; cursor: pointer; }
+
+/* Section Title */
+.section-title { padding: 20px 20px 12px; font-size: 13px; color: #999; }
+
+/* List Items */
+.list-item { display: flex; align-items: center; padding: 14px 20px; cursor: pointer; transition: background 0.15s; }
+.list-item:active { background: #f5f5f5; }
+.avatar { width: 44px; height: 44px; border-radius: 50%; margin-right: 12px; display: flex; align-items: center; justify-content: center; font-size: 16px; color: #fff; flex-shrink: 0; overflow: hidden; background: #e0e0e0; }
+.avatar img { width: 100%; height: 100%; object-fit: cover; }
+.item-info { flex: 1; min-width: 0; }
+.item-name-row { display: flex; align-items: center; gap: 6px; margin-bottom: 3px; }
+.item-name { font-size: 16px; font-weight: 500; color: #000; }
+.item-desc { font-size: 13px; color: #999; }
+
+/* Tags */
+.tag { font-size: 11px; padding: 2px 8px; border-radius: 4px; white-space: nowrap; font-weight: 500; }
+.tag-family { background: #FFF3E0; color: #F57C00; }
+.tag-device { background: #FFF3E0; color: #F57C00; }
+.tag-shared { background: #f0f0f0; color: #999; }
+
+/* Right Action */
+.item-action { font-size: 13px; color: #333; cursor: pointer; flex-shrink: 0; margin-left: 8px; background: #f5f5f5; padding: 6px 12px; border-radius: 16px; }
+.item-action.cancel { color: #333; }
+
+/* Entry Items (微信好友、小米账号) */
+.entry-item { display: flex; align-items: center; padding: 16px 20px; cursor: pointer; }
+.entry-item:active { background: #f5f5f5; }
+.entry-icon { width: 44px; height: 44px; border-radius: 50%; margin-right: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.entry-icon.wechat { background: #07C160; }
+.entry-icon.xiaomi { background: #FF6900; }
+.entry-icon svg, .entry-icon img { width: 24px; height: 24px; }
+.entry-text { flex: 1; font-size: 16px; color: #000; }
+.entry-arrow { color: #ccc; font-size: 14px; }
+
+/* Device Section */
+.device-section { text-align: center; padding: 20px 0 24px; }
+.device-img { width: 140px; height: 90px; background: linear-gradient(135deg, #1a3a4a, #2d5a6e); border-radius: 12px; margin: 0 auto 16px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.device-img span { color: #4dd9ff; font-size: 14px; font-weight: 600; }
+.device-name { font-size: 18px; font-weight: 600; margin-bottom: 8px; }
+.device-desc { font-size: 14px; color: #999; line-height: 1.6; }
+
+/* Input Section */
+.input-section { padding: 0 20px 0; }
+.input-box { border: 2px solid #4CD964; border-radius: 28px; padding: 14px 20px; font-size: 15px; color: #999; display: flex; align-items: center; justify-content: space-between; cursor: pointer; }
+.input-box.has-value { color: #000; }
+.input-box .clear-btn { width: 20px; height: 20px; background: #ddd; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #fff; cursor: pointer; display: none; }
+.input-box.has-value .clear-btn { display: flex; }
+
+/* Bottom Button */
+.bottom-area { position: absolute; bottom: 34px; left: 0; right: 0; padding: 0 20px; }
+.btn-primary { width: 100%; padding: 16px; background: #4CD964; color: #fff; border: none; border-radius: 28px; font-size: 17px; font-weight: 600; cursor: pointer; transition: transform 0.1s, opacity 0.15s; }
+.btn-primary:active { transform: scale(0.97); }
+
+/* Toast */
+.toast { position: absolute; bottom: 100px; left: 50%; transform: translateX(-50%); background: rgba(0, 0, 0, 0.75); color: #fff; padding: 10px 20px; border-radius: 20px; font-size: 13px; white-space: nowrap; opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 100; max-width: 320px; text-align: center; }
+.toast.show { opacity: 1; }
+
+/* Pages */
+.page { display: none; width: 100%; height: 100%; position: absolute; top: 0; left: 0; background: #fff; overflow-y: auto; }
+.page.active { display: block; }
+
+/* Scrollable content */
+.page-content { padding-bottom: 100px; }
+
+/* Confirm Page */
+.confirm-section { text-align: center; padding: 60px 20px 0; }
+.confirm-avatar { width: 80px; height: 80px; background: #e8e8e8; border-radius: 50%; margin: 0 auto 16px; display: flex; align-items: center; justify-content: center; }
+.confirm-avatar svg { width: 40px; height: 40px; fill: #bbb; }
+.confirm-name { font-size: 18px; font-weight: 600; margin-bottom: 8px; }
+.confirm-desc { font-size: 14px; color: #666; }
+
+/* Modal / Bottom Sheet */
+.modal-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 50; display: none; align-items: flex-end; }
+.modal-overlay.show { display: flex; }
+.modal-sheet { width: 100%; background: #fff; border-radius: 16px 16px 0 0; padding: 24px 24px 40px; }
+.modal-title { font-size: 17px; font-weight: 600; text-align: center; margin-bottom: 20px; }
+.permission-option { padding: 16px; border: 1px solid #eee; border-radius: 12px; margin-bottom: 12px; cursor: pointer; display: flex; align-items: flex-start; gap: 12px; }
+.permission-option.selected { border-color: #4CD964; }
+.permission-option .check { width: 22px; height: 22px; border-radius: 50%; border: 2px solid #ddd; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; }
+.permission-option.selected .check { border-color: #4CD964; background: #4CD964; }
+.permission-option.selected .check::after { content: '✓'; color: #fff; font-size: 13px; font-weight: 700; }
+.permission-label { font-size: 16px; font-weight: 500; margin-bottom: 4px; }
+.permission-desc { font-size: 12px; color: #999; }
+.modal-buttons { display: flex; gap: 12px; margin-top: 20px; }
+.modal-buttons .btn { flex: 1; padding: 14px; border-radius: 24px; font-size: 16px; font-weight: 600; cursor: pointer; text-align: center; border: none; }
+.modal-buttons .btn-cancel { background: #f5f5f5; color: #333; }
+.modal-buttons .btn-next { background: #4CD964; color: #fff; }
+
+/* Keyboard */
+.keyboard { position: absolute; bottom: 0; left: 0; right: 0; background: #d1d5db; padding: 6px 3px 24px; display: none; z-index: 30; }
+.keyboard.show { display: block; }
+.kb-toolbar { display: flex; align-items: center; justify-content: space-between; padding: 6px 8px 8px; background: #eee; margin-bottom: 4px; border-radius: 0; }
+.kb-toolbar span { font-size: 20px; color: #666; padding: 4px 8px; }
+.kb-toolbar .chevron { font-size: 16px; }
+.key-row { display: flex; justify-content: center; gap: 5px; margin-bottom: 6px; }
+.key { background: #fff; border-radius: 6px; padding: 11px 0; flex: 1; max-width: 36px; text-align: center; font-size: 16px; box-shadow: 0 1px 2px rgba(0,0,0,0.2); cursor: pointer; }
+.key:active { background: #ddd; }
+.key.wide { max-width: 52px; font-size: 13px; background: #adb5bd; color: #000; }
+.key.space { max-width: 180px; }
+.key.search-btn { max-width: 60px; background: #4CD964; color: #fff; font-size: 14px; font-weight: 600; }
+
+/* Home indicator */
+.home-indicator { position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); width: 134px; height: 5px; background: #000; border-radius: 3px; z-index: 40; }
+
+/* Separator */
+.separator { height: 0.5px; background: #f0f0f0; margin: 0 20px; }
+
+/* Member Info Page */
+.member-header { display: flex; align-items: center; padding: 24px 20px 20px; }
+.member-header .member-avatar { width: 64px; height: 64px; border-radius: 50%; margin-right: 16px; display: flex; align-items: center; justify-content: center; font-size: 24px; color: #fff; flex-shrink: 0; }
+.member-header .member-meta .member-name { font-size: 20px; font-weight: 600; margin-bottom: 4px; }
+.member-header .member-meta .member-join { font-size: 13px; color: #999; }
+.info-list { padding: 0 20px; }
+.info-row { display: flex; align-items: center; justify-content: space-between; padding: 18px 0; border-bottom: 0.5px solid #f0f0f0; }
+.info-row:last-child { border-bottom: none; }
+.info-label { font-size: 16px; font-weight: 500; color: #000; }
+.info-value { font-size: 15px; color: #999; display: flex; align-items: center; gap: 4px; }
+.info-value .arrow { color: #ccc; }
+.btn-remove { width: calc(100% - 40px); margin: 0 20px; padding: 16px; background: #f5f5f5; color: #FF3B30; border: none; border-radius: 28px; font-size: 16px; font-weight: 500; cursor: pointer; }
+.btn-remove:active { background: #eee; }
+</style>
+</head>
+<body>
+
+<div class="phone-frame">
+  <div class="screen">
+    <!-- Page 1: 主页面 (摄像机 C300共享管理) -->
+    <div class="page active" id="page-main">
+      <div class="page-content">
+        <div class="status-bar">
+          <span class="time">2:36</span>
+          <div class="icons">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3C7 3 2.7 6 1 10.2l2 1c1.3-3.2 4.7-5.5 9-5.5s7.7 2.3 9 5.5l2-1C21.3 6 17 3 12 3zm0 4c-3.3 0-6.2 1.8-7.8 4.5l2 1c1.2-2 3.4-3.3 5.8-3.3s4.6 1.3 5.8 3.3l2-1C18.2 8.8 15.3 7 12 7zm0 4c-1.8 0-3.4 1-4.2 2.5L12 16l4.2-2.5C15.4 12 13.8 11 12 11z"/></svg>
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17 4h-3V2h-4v2H7v18h10V4z"/></svg>
+          </div>
+        </div>
+        <div class="nav-bar">
+          <span class="back">←</span>
+          <span class="title">摄像机 C300共享管理</span>
+          <span class="edit">✎</span>
+        </div>
+
+        <div class="section-title">已共享</div>
+
+        <div class="list-item" onclick="goToMember('aibi')">
+          <div class="avatar" style="background: linear-gradient(135deg, #8B5CF6, #6366F1);">艾</div>
+          <div class="item-info">
+            <div class="item-name-row">
+              <span class="item-name">艾比</span>
+              <span class="tag tag-family">家庭共享</span>
+            </div>
+            <div class="item-desc">家庭成员，默认仅可查看</div>
+          </div>
+          <span class="item-action">管理></span>
+        </div>
+        <div class="separator"></div>
+        <div class="list-item" onclick="goToMember('hahaha')">
+          <div class="avatar" style="background: linear-gradient(135deg, #F59E0B, #EF4444);">哈</div>
+          <div class="item-info">
+            <div class="item-name-row">
+              <span class="item-name">哈哈哈</span>
+              <span class="tag tag-family">家庭共享</span>
+            </div>
+            <div class="item-desc">家庭管理员，默认允许控制</div>
+          </div>
+          <span class="item-action">管理></span>
+        </div>
+        <div class="separator"></div>
+        <div class="list-item">
+          <div class="avatar" style="background: linear-gradient(135deg, #3B82F6, #6366F1);">乔</div>
+          <div class="item-info">
+            <div class="item-name-row">
+              <span class="item-name">乔纳森</span>
+              <span class="tag tag-device">单设备共享</span>
+            </div>
+            <div class="item-desc">2023/12/6 允许控制</div>
+          </div>
+          <span class="item-action cancel" onclick="event.stopPropagation(); showToast('page-main', '已取消共享')">取消共享</span>
+        </div>
+
+        <div class="section-title">去共享</div>
+
+        <div class="entry-item" onclick="showToast('page-main', '跳转微信好友选择')">
+          <div class="entry-icon wechat">
+            <svg viewBox="0 0 24 24" fill="#fff"><path d="M8.5 11a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm5 0a1.5 1.5 0 100-3 1.5 1.5 0 000 3zM12 2C6.48 2 2 5.82 2 10.5c0 2.64 1.44 5 3.7 6.56L5 20l3.13-1.56c1.2.36 2.5.56 3.87.56 5.52 0 10-3.82 10-8.5S17.52 2 12 2z"/></svg>
+          </div>
+          <span class="entry-text">微信好友</span>
+          <span class="entry-arrow">›</span>
+        </div>
+        <div class="separator"></div>
+        <div class="entry-item" onclick="goToPage('page-share')">
+          <div class="entry-icon xiaomi">
+            <svg viewBox="0 0 24 24" fill="#fff"><path d="M4 4h16v16H4V4zm2 2v12h12V6H6z"/></svg>
+          </div>
+          <span class="entry-text">小米账号 (手机号)</span>
+          <span class="entry-arrow">›</span>
+        </div>
+
+        <div class="section-title">最近联系人</div>
+
+        <div class="list-item" onclick="showToast('page-main', '该用户已是家庭共享成员，可使用设备，无需重复共享')">
+          <div class="avatar" style="background: linear-gradient(135deg, #8B5CF6, #6366F1);">艾</div>
+          <div class="item-info">
+            <div class="item-name-row">
+              <span class="item-name">艾比</span>
+              <span class="tag tag-shared">已共享</span>
+            </div>
+            <div class="item-desc">6871263333</div>
+          </div>
+          <span class="entry-arrow">›</span>
+        </div>
+        <div class="separator"></div>
+        <div class="list-item" onclick="showToast('page-main', '该用户已共享过此设备，无需重复共享')">
+          <div class="avatar" style="background: linear-gradient(135deg, #3B82F6, #6366F1);">乔</div>
+          <div class="item-info">
+            <div class="item-name-row">
+              <span class="item-name">乔纳森</span>
+              <span class="tag tag-shared">已共享</span>
+            </div>
+            <div class="item-desc">6871263111</div>
+          </div>
+          <span class="entry-arrow">›</span>
+        </div>
+        <div class="separator"></div>
+        <div class="list-item" onclick="showPermissionModal()">
+          <div class="avatar" style="background: #e0e0e0; color: #999;">小</div>
+          <div class="item-info">
+            <div class="item-name-row">
+              <span class="item-name">小可</span>
+            </div>
+            <div class="item-desc">6871263222</div>
+          </div>
+          <span class="entry-arrow">›</span>
+        </div>
+      </div>
+
+      <!-- Permission Modal -->
+      <div class="modal-overlay" id="modal-permission">
+        <div class="modal-sheet">
+          <div class="modal-title">共享设备使用权限</div>
+          <div class="permission-option selected" onclick="selectPermission(this)">
+            <div class="check"></div>
+            <div>
+              <div class="permission-label">允许控制</div>
+              <div class="permission-desc">可浏览设备信息|可控制设备|可管理设备</div>
+            </div>
+          </div>
+          <div class="permission-option" onclick="selectPermission(this)">
+            <div class="check"></div>
+            <div>
+              <div class="permission-label">仅可查看</div>
+              <div class="permission-desc">仅可浏览设备信息 |不可控制设备| 不可管理设备</div>
+            </div>
+          </div>
+          <div class="modal-buttons">
+            <button class="btn btn-cancel" onclick="hidePermissionModal()">取消</button>
+            <button class="btn btn-next" onclick="hidePermissionModal(); goToPage('page-confirm')">下一步</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="toast" id="toast-main"></div>
+      <div class="home-indicator"></div>
+    </div>
+
+    <!-- Page 2: 去共享页面 (共享给小米账号) -->
+    <div class="page" id="page-share">
+      <div class="page-content">
+        <div class="status-bar">
+          <span class="time">2:36</span>
+          <div class="icons">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3C7 3 2.7 6 1 10.2l2 1c1.3-3.2 4.7-5.5 9-5.5s7.7 2.3 9 5.5l2-1C21.3 6 17 3 12 3zm0 4c-3.3 0-6.2 1.8-7.8 4.5l2 1c1.2-2 3.4-3.3 5.8-3.3s4.6 1.3 5.8 3.3l2-1C18.2 8.8 15.3 7 12 7zm0 4c-1.8 0-3.4 1-4.2 2.5L12 16l4.2-2.5C15.4 12 13.8 11 12 11z"/></svg>
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17 4h-3V2h-4v2H7v18h10V4z"/></svg>
+          </div>
+        </div>
+        <div class="nav-bar">
+          <span class="back" onclick="goToPage('page-main'); hideKeyboard();">←</span>
+          <span class="title">共享给小米账号</span>
+          <span class="edit" style="visibility:hidden;">✎</span>
+        </div>
+
+        <div class="device-section">
+          <div class="device-img"><span>08:16</span></div>
+          <div class="device-name">小米小爱音箱 Sound</div>
+          <div class="device-desc">快来共享设备，<br>和家人一起享受智能生活吧！</div>
+        </div>
+
+        <div class="input-section">
+          <div class="input-box" id="input-box" onclick="showKeyboard()">
+            <span id="input-text">邮箱/手机号/小米账号</span>
+            <span class="clear-btn" onclick="event.stopPropagation(); clearInput()">×</span>
+          </div>
+        </div>
+
+        <div class="section-title" id="contact-title">最近联系人</div>
+
+        <div id="contact-list">
+          <div class="list-item" onclick="showToast('page-share', '该用户已是家庭共享成员，可使用设备，无需重复共享')">
+            <div class="avatar" style="background: linear-gradient(135deg, #8B5CF6, #6366F1);">艾</div>
+            <div class="item-info">
+              <div class="item-name-row">
+                <span class="item-name">艾比</span>
+                <span class="tag tag-shared">已共享</span>
+              </div>
+              <div class="item-desc">6871263333</div>
+            </div>
+          </div>
+          <div class="separator"></div>
+          <div class="list-item" onclick="showToast('page-share', '该用户已共享过此设备，无需重复共享')">
+            <div class="avatar" style="background: linear-gradient(135deg, #3B82F6, #6366F1);">乔</div>
+            <div class="item-info">
+              <div class="item-name-row">
+                <span class="item-name">乔纳森</span>
+                <span class="tag tag-shared">已共享</span>
+              </div>
+              <div class="item-desc">6871263111</div>
+            </div>
+          </div>
+          <div class="separator"></div>
+          <div class="list-item" onclick="goToPage('page-confirm')">
+            <div class="avatar" style="background: #e0e0e0; color: #999;">小</div>
+            <div class="item-info">
+              <div class="item-name-row">
+                <span class="item-name">小可</span>
+              </div>
+              <div class="item-desc">6871263222</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bottom-area" id="share-btn-area">
+        <button class="btn-primary" onclick="handleShareBtn()">共享</button>
+      </div>
+
+      <!-- Keyboard -->
+      <div class="keyboard" id="keyboard">
+        <div class="kb-toolbar">
+          <span>⊞</span>
+          <span>☺</span>
+          <span>¶</span>
+          <span>🎙</span>
+          <span class="chevron" onclick="hideKeyboard()">∨</span>
+        </div>
+        <div class="key-row">
+          <div class="key" onclick="typeKey('Q')">Q</div>
+          <div class="key" onclick="typeKey('W')">W</div>
+          <div class="key" onclick="typeKey('E')">E</div>
+          <div class="key" onclick="typeKey('R')">R</div>
+          <div class="key" onclick="typeKey('T')">T</div>
+          <div class="key" onclick="typeKey('Y')">Y</div>
+          <div class="key" onclick="typeKey('U')">U</div>
+          <div class="key" onclick="typeKey('I')">I</div>
+          <div class="key" onclick="typeKey('O')">O</div>
+          <div class="key" onclick="typeKey('P')">P</div>
+        </div>
+        <div class="key-row">
+          <div class="key" onclick="typeKey('A')">A</div>
+          <div class="key" onclick="typeKey('S')">S</div>
+          <div class="key" onclick="typeKey('D')">D</div>
+          <div class="key" onclick="typeKey('F')">F</div>
+          <div class="key" onclick="typeKey('G')">G</div>
+          <div class="key" onclick="typeKey('H')">H</div>
+          <div class="key" onclick="typeKey('J')">J</div>
+          <div class="key" onclick="typeKey('K')">K</div>
+          <div class="key" onclick="typeKey('L')">L</div>
+        </div>
+        <div class="key-row">
+          <div class="key wide">分词</div>
+          <div class="key" onclick="typeKey('Z')">Z</div>
+          <div class="key" onclick="typeKey('X')">X</div>
+          <div class="key" onclick="typeKey('C')">C</div>
+          <div class="key" onclick="typeKey('V')">V</div>
+          <div class="key" onclick="typeKey('B')">B</div>
+          <div class="key" onclick="typeKey('N')">N</div>
+          <div class="key" onclick="typeKey('M')">M</div>
+          <div class="key wide" onclick="backspace()">⌫</div>
+        </div>
+        <div class="key-row">
+          <div class="key wide">符</div>
+          <div class="key wide">123</div>
+          <div class="key">，</div>
+          <div class="key space" onclick="typeKey(' ')"></div>
+          <div class="key">。</div>
+          <div class="key">中</div>
+          <div class="key search-btn" onclick="handleSearch()">搜索</div>
+        </div>
+      </div>
+
+      <div class="toast" id="toast-share"></div>
+      <div class="home-indicator"></div>
+    </div>
+
+    <!-- Page 4: 成员信息页面 -->
+    <div class="page" id="page-member">
+      <div class="page-content">
+        <div class="status-bar">
+          <span class="time">2:36</span>
+          <div class="icons">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3C7 3 2.7 6 1 10.2l2 1c1.3-3.2 4.7-5.5 9-5.5s7.7 2.3 9 5.5l2-1C21.3 6 17 3 12 3zm0 4c-3.3 0-6.2 1.8-7.8 4.5l2 1c1.2-2 3.4-3.3 5.8-3.3s4.6 1.3 5.8 3.3l2-1C18.2 8.8 15.3 7 12 7zm0 4c-1.8 0-3.4 1-4.2 2.5L12 16l4.2-2.5C15.4 12 13.8 11 12 11z"/></svg>
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17 4h-3V2h-4v2H7v18h10V4z"/></svg>
+          </div>
+        </div>
+        <div class="nav-bar">
+          <span class="back" onclick="goToPage('page-main')">←</span>
+          <span class="title">成员信息</span>
+          <span class="edit" style="visibility:hidden;">✎</span>
+        </div>
+
+        <div class="member-header">
+          <div class="member-avatar" id="member-avatar" style="background: linear-gradient(135deg, #8B5CF6, #6366F1);">艾</div>
+          <div class="member-meta">
+            <div class="member-name" id="member-name">艾比</div>
+            <div class="member-join" id="member-join">2025-04-16 由帆先生邀请加入家庭</div>
+          </div>
+        </div>
+
+        <div class="info-list">
+          <div class="info-row">
+            <span class="info-label">小米 ID</span>
+            <span class="info-value" id="member-id">1461070703</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">昵称</span>
+            <span class="info-value" id="member-nick">DamonWang</span>
+          </div>
+          <div class="info-row" style="cursor: pointer;">
+            <span class="info-label">备注</span>
+            <span class="info-value" id="member-remark">艾比 <span class="arrow">›</span></span>
+          </div>
+          <div class="info-row" style="cursor: pointer;">
+            <span class="info-label">家庭权限</span>
+            <span class="info-value" id="member-role">管理员 <span class="arrow">›</span></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="bottom-area">
+        <button class="btn-remove" onclick="showToast('page-member', '已移除成员')">移除成员</button>
+      </div>
+
+      <div class="toast" id="toast-member"></div>
+      <div class="home-indicator"></div>
+    </div>
+
+    <!-- Page 3: 确认共享页面 -->
+    <div class="page" id="page-confirm">
+      <div class="page-content">
+        <div class="status-bar">
+          <span class="time">2:36</span>
+          <div class="icons">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3C7 3 2.7 6 1 10.2l2 1c1.3-3.2 4.7-5.5 9-5.5s7.7 2.3 9 5.5l2-1C21.3 6 17 3 12 3zm0 4c-3.3 0-6.2 1.8-7.8 4.5l2 1c1.2-2 3.4-3.3 5.8-3.3s4.6 1.3 5.8 3.3l2-1C18.2 8.8 15.3 7 12 7zm0 4c-1.8 0-3.4 1-4.2 2.5L12 16l4.2-2.5C15.4 12 13.8 11 12 11z"/></svg>
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17 4h-3V2h-4v2H7v18h10V4z"/></svg>
+          </div>
+        </div>
+        <div class="nav-bar">
+          <span class="back" onclick="goBack()">←</span>
+          <span class="title">共享给小米账号</span>
+          <span class="edit" style="visibility:hidden;">✎</span>
+        </div>
+
+        <div class="confirm-section">
+          <div class="confirm-avatar">
+            <svg viewBox="0 0 24 24"><path d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v3h20v-3c0-3.3-6.7-5-10-5z"/></svg>
+          </div>
+          <div class="confirm-name">共享给小可</div>
+          <div class="confirm-desc">允许控制小米智能门锁</div>
+        </div>
+      </div>
+
+      <div class="bottom-area">
+        <button class="btn-primary" onclick="showToast('page-confirm', '共享成功'); setTimeout(() => goToPage('page-main'), 1500);">确定</button>
+      </div>
+
+      <div class="toast" id="toast-confirm"></div>
+      <div class="home-indicator"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+let inputValue = '';
+let fromPage = 'page-main';
+
+const memberData = {
+  aibi: {
+    name: '艾比',
+    avatar: '艾',
+    avatarBg: 'linear-gradient(135deg, #8B5CF6, #6366F1)',
+    join: '2025-04-16 由帆先生邀请加入家庭',
+    id: '1461070703',
+    nick: 'DamonWang',
+    remark: '艾比',
+    role: '成员'
+  },
+  hahaha: {
+    name: '哈哈哈',
+    avatar: '哈',
+    avatarBg: 'linear-gradient(135deg, #F59E0B, #EF4444)',
+    join: '2025-03-20 由帆先生邀请加入家庭',
+    id: '1562830291',
+    nick: 'HaHaHa',
+    remark: '哈哈哈',
+    role: '管理员'
+  }
+};
+
+function goToMember(key) {
+  const data = memberData[key];
+  document.getElementById('member-avatar').textContent = data.avatar;
+  document.getElementById('member-avatar').style.background = data.avatarBg;
+  document.getElementById('member-name').textContent = data.name;
+  document.getElementById('member-join').textContent = data.join;
+  document.getElementById('member-id').textContent = data.id;
+  document.getElementById('member-nick').textContent = data.nick;
+  document.getElementById('member-remark').innerHTML = data.remark + ' <span class="arrow">›</span>';
+  document.getElementById('member-role').innerHTML = data.role + ' <span class="arrow">›</span>';
+  goToPage('page-member');
+}
+
+function goToPage(pageId) {
+  if (pageId === 'page-confirm') {
+    fromPage = document.querySelector('.page.active').id;
+  }
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(pageId).classList.add('active');
+  if (pageId === 'page-share') {
+    resetSharePage();
+  }
+}
+
+function goBack() {
+  goToPage(fromPage);
+}
+
+function resetSharePage() {
+  inputValue = '';
+  document.getElementById('input-text').textContent = '邮箱/手机号/小米账号';
+  document.getElementById('input-box').classList.remove('has-value');
+  document.getElementById('contact-title').style.display = '';
+  document.getElementById('contact-list').style.display = '';
+  document.getElementById('share-btn-area').style.bottom = '34px';
+  hideKeyboard();
+}
+
+function showToast(pageId, msg) {
+  const page = document.getElementById(pageId);
+  const toast = page.querySelector('.toast');
+  if (toast) {
+    toast.textContent = msg;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2000);
+  }
+}
+
+function showPermissionModal() {
+  document.getElementById('modal-permission').classList.add('show');
+}
+
+function hidePermissionModal() {
+  document.getElementById('modal-permission').classList.remove('show');
+}
+
+function selectPermission(el) {
+  document.querySelectorAll('.permission-option').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function showKeyboard() {
+  document.getElementById('keyboard').classList.add('show');
+  document.getElementById('share-btn-area').style.bottom = '280px';
+  document.getElementById('contact-title').style.display = 'none';
+  document.getElementById('contact-list').style.display = 'none';
+}
+
+function hideKeyboard() {
+  document.getElementById('keyboard').classList.remove('show');
+  document.getElementById('share-btn-area').style.bottom = '34px';
+  if (!inputValue) {
+    document.getElementById('contact-title').style.display = '';
+    document.getElementById('contact-list').style.display = '';
+  }
+}
+
+function typeKey(char) {
+  inputValue += char;
+  updateInput();
+}
+
+function backspace() {
+  inputValue = inputValue.slice(0, -1);
+  updateInput();
+}
+
+function clearInput() {
+  inputValue = '';
+  updateInput();
+  document.getElementById('contact-title').style.display = '';
+  document.getElementById('contact-list').style.display = '';
+}
+
+function updateInput() {
+  const box = document.getElementById('input-box');
+  const text = document.getElementById('input-text');
+  if (inputValue) {
+    text.textContent = inputValue;
+    box.classList.add('has-value');
+  } else {
+    text.textContent = '邮箱/手机号/小米账号';
+    box.classList.remove('has-value');
+  }
+}
+
+function handleSearch() {
+  if (!inputValue) return;
+  hideKeyboard();
+  handleShareAction();
+}
+
+function handleShareBtn() {
+  if (!inputValue) {
+    showToast('page-share', '请输入账号');
+    return;
+  }
+  handleShareAction();
+}
+
+function handleShareAction() {
+  if (inputValue === '6871263333' || inputValue.toLowerCase().includes('艾比')) {
+    showToast('page-share', '该用户已是家庭共享成员，可使用设备，无需重复共享');
+  } else if (inputValue === '6871263111' || inputValue.toLowerCase().includes('乔纳森')) {
+    showToast('page-share', '该用户已共享过此设备，无需重复共享');
+  } else {
+    goToPage('page-confirm');
+  }
+}
+
+// Quick input helpers - click input area to show predefined options
+let tapCount = 0;
+document.getElementById('input-box')?.addEventListener('dblclick', function() {
+  tapCount++;
+  const accounts = ['6871263222', '6871263333', '6871263111'];
+  inputValue = accounts[(tapCount - 1) % 3];
+  updateInput();
+});
+</script>
+
+</body>
+</html>
