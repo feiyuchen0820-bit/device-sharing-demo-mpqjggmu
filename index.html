@@ -174,7 +174,7 @@ body { font-family: -apple-system, "MiSans", "PingFang SC", sans-serif; backgrou
             </div>
             <div class="item-desc">家庭管理员，默认允许控制</div>
           </div>
-          <span class="item-action">管理></span>
+          <span class="item-action" onclick="event.stopPropagation(); goToPage('page-family-list')">管理></span>
         </div>
         <div class="separator"></div>
         <div class="list-item" onclick="goToMember('aibi')">
@@ -186,7 +186,7 @@ body { font-family: -apple-system, "MiSans", "PingFang SC", sans-serif; backgrou
             </div>
             <div class="item-desc">家庭成员，默认仅可查看</div>
           </div>
-          <span class="item-action">管理></span>
+          <span class="item-action" onclick="event.stopPropagation(); goToPage('page-family-list')">管理></span>
         </div>
         <div class="separator"></div>
         <div class="list-item">
@@ -351,7 +351,7 @@ body { font-family: -apple-system, "MiSans", "PingFang SC", sans-serif; backgrou
         </div>
       </div>
 
-      <div class="toast" id="toast-share"></div>
+      <div class="toast" id="toast-share" style="bottom:345px;"></div>
       <div class="home-indicator"></div>
     </div>
 
@@ -439,6 +439,74 @@ body { font-family: -apple-system, "MiSans", "PingFang SC", sans-serif; backgrou
       <div class="toast" id="toast-confirm"></div>
       <div class="home-indicator"></div>
     </div>
+
+    <!-- Page 5: 家庭成员列表 -->
+    <div class="page" id="page-family-list">
+      <div class="page-content">
+        <div class="status-bar">
+          <span class="time">2:36</span>
+          <div class="icons">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3C7 3 2.7 6 1 10.2l2 1c1.3-3.2 4.7-5.5 9-5.5s7.7 2.3 9 5.5l2-1C21.3 6 17 3 12 3zm0 4c-3.3 0-6.2 1.8-7.8 4.5l2 1c1.2-2 3.4-3.3 5.8-3.3s4.6 1.3 5.8 3.3l2-1C18.2 8.8 15.3 7 12 7zm0 4c-1.8 0-3.4 1-4.2 2.5L12 16l4.2-2.5C15.4 12 13.8 11 12 11z"/></svg>
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17 4h-3V2h-4v2H7v18h10V4z"/></svg>
+          </div>
+        </div>
+        <div class="nav-bar">
+          <span class="back" onclick="goToPage('page-main')">←</span>
+          <span class="title">家庭成员</span>
+          <span class="edit" style="visibility:hidden;">✎</span>
+        </div>
+
+        <div class="section-title">家庭成员（3）</div>
+
+        <div class="list-item">
+          <div class="avatar" style="background: linear-gradient(135deg, #34C759, #2AA84A);">帆</div>
+          <div class="item-info">
+            <div class="item-name-row">
+              <span class="item-name">帆先生</span>
+              <span class="tag" style="background:#E8F8EE;color:#2AA84A;">户主 · 我</span>
+            </div>
+            <div class="item-desc">家庭创建者，拥有全部权限</div>
+          </div>
+          <span class="entry-arrow">›</span>
+        </div>
+        <div class="separator"></div>
+        <div class="list-item" onclick="goToMember('hahaha')">
+          <div class="avatar" style="background: linear-gradient(135deg, #F59E0B, #EF4444);">哈</div>
+          <div class="item-info">
+            <div class="item-name-row">
+              <span class="item-name">哈哈哈</span>
+              <span class="tag" style="background:#FFF3E0;color:#F57C00;">管理员</span>
+            </div>
+            <div class="item-desc">默认允许控制设备</div>
+          </div>
+          <span class="entry-arrow">›</span>
+        </div>
+        <div class="separator"></div>
+        <div class="list-item" onclick="goToMember('aibi')">
+          <div class="avatar" style="background: linear-gradient(135deg, #8B5CF6, #6366F1);">艾</div>
+          <div class="item-info">
+            <div class="item-name-row">
+              <span class="item-name">艾比</span>
+              <span class="tag" style="background:#f0f0f0;color:#999;">成员</span>
+            </div>
+            <div class="item-desc">默认仅可查看设备</div>
+          </div>
+          <span class="entry-arrow">›</span>
+        </div>
+
+        <div class="section-title">添加</div>
+        <div class="entry-item" onclick="showToast('page-family-list', '邀请家人加入家庭')">
+          <div class="entry-icon" style="background:#f0f0f0;">
+            <svg viewBox="0 0 24 24" fill="#666"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+          </div>
+          <span class="entry-text">添加成员</span>
+          <span class="entry-arrow">›</span>
+        </div>
+      </div>
+
+      <div class="toast" id="toast-family-list"></div>
+      <div class="home-indicator"></div>
+    </div>
   </div>
 </div>
 
@@ -498,12 +566,9 @@ function goBack() {
 }
 
 function resetSharePage() {
-  inputValue = '';
-  document.getElementById('input-text').textContent = '邮箱/手机号/小米账号';
-  document.getElementById('input-box').classList.remove('has-value');
-  setContactListDisplay('');
-  document.getElementById('share-btn-area').style.bottom = '34px';
-  hideKeyboard();
+  inputValue = '6871263333';
+  updateInput();
+  showKeyboard();
 }
 
 function setContactListDisplay(val) {
