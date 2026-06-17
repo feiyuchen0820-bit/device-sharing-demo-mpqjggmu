@@ -165,18 +165,6 @@ body { font-family: -apple-system, "MiSans", "PingFang SC", sans-serif; backgrou
 
         <div class="section-title">已共享</div>
 
-        <div class="list-item" onclick="goToMember('aibi')">
-          <div class="avatar" style="background: linear-gradient(135deg, #8B5CF6, #6366F1);">艾</div>
-          <div class="item-info">
-            <div class="item-name-row">
-              <span class="item-name">艾比</span>
-              <span class="tag tag-family">家庭共享</span>
-            </div>
-            <div class="item-desc">家庭成员，默认仅可查看</div>
-          </div>
-          <span class="item-action">管理></span>
-        </div>
-        <div class="separator"></div>
         <div class="list-item" onclick="goToMember('hahaha')">
           <div class="avatar" style="background: linear-gradient(135deg, #F59E0B, #EF4444);">哈</div>
           <div class="item-info">
@@ -185,6 +173,18 @@ body { font-family: -apple-system, "MiSans", "PingFang SC", sans-serif; backgrou
               <span class="tag tag-family">家庭共享</span>
             </div>
             <div class="item-desc">家庭管理员，默认允许控制</div>
+          </div>
+          <span class="item-action">管理></span>
+        </div>
+        <div class="separator"></div>
+        <div class="list-item" onclick="goToMember('aibi')">
+          <div class="avatar" style="background: linear-gradient(135deg, #8B5CF6, #6366F1);">艾</div>
+          <div class="item-info">
+            <div class="item-name-row">
+              <span class="item-name">艾比</span>
+              <span class="tag tag-family">家庭共享</span>
+            </div>
+            <div class="item-desc">家庭成员，默认仅可查看</div>
           </div>
           <span class="item-action">管理></span>
         </div>
@@ -221,30 +221,6 @@ body { font-family: -apple-system, "MiSans", "PingFang SC", sans-serif; backgrou
 
         <div class="section-title">最近联系人</div>
 
-        <div class="list-item" onclick="showToast('page-main', '该用户已是家庭共享成员，可使用设备，无需重复共享')">
-          <div class="avatar" style="background: linear-gradient(135deg, #8B5CF6, #6366F1);">艾</div>
-          <div class="item-info">
-            <div class="item-name-row">
-              <span class="item-name">艾比</span>
-              <span class="tag tag-shared">已共享</span>
-            </div>
-            <div class="item-desc">6871263333</div>
-          </div>
-          <span class="entry-arrow">›</span>
-        </div>
-        <div class="separator"></div>
-        <div class="list-item" onclick="showToast('page-main', '该用户已共享过此设备，无需重复共享')">
-          <div class="avatar" style="background: linear-gradient(135deg, #3B82F6, #6366F1);">乔</div>
-          <div class="item-info">
-            <div class="item-name-row">
-              <span class="item-name">乔纳森</span>
-              <span class="tag tag-shared">已共享</span>
-            </div>
-            <div class="item-desc">6871263111</div>
-          </div>
-          <span class="entry-arrow">›</span>
-        </div>
-        <div class="separator"></div>
         <div class="list-item" onclick="showPermissionModal()">
           <div class="avatar" style="background: #e0e0e0; color: #999;">小</div>
           <div class="item-info">
@@ -315,41 +291,6 @@ body { font-family: -apple-system, "MiSans", "PingFang SC", sans-serif; backgrou
           </div>
         </div>
 
-        <div class="section-title" id="contact-title">最近联系人</div>
-
-        <div id="contact-list">
-          <div class="list-item" onclick="showToast('page-share', '该用户已是家庭共享成员，可使用设备，无需重复共享')">
-            <div class="avatar" style="background: linear-gradient(135deg, #8B5CF6, #6366F1);">艾</div>
-            <div class="item-info">
-              <div class="item-name-row">
-                <span class="item-name">艾比</span>
-                <span class="tag tag-shared">已共享</span>
-              </div>
-              <div class="item-desc">6871263333</div>
-            </div>
-          </div>
-          <div class="separator"></div>
-          <div class="list-item" onclick="showToast('page-share', '该用户已共享过此设备，无需重复共享')">
-            <div class="avatar" style="background: linear-gradient(135deg, #3B82F6, #6366F1);">乔</div>
-            <div class="item-info">
-              <div class="item-name-row">
-                <span class="item-name">乔纳森</span>
-                <span class="tag tag-shared">已共享</span>
-              </div>
-              <div class="item-desc">6871263111</div>
-            </div>
-          </div>
-          <div class="separator"></div>
-          <div class="list-item" onclick="goToPage('page-confirm')">
-            <div class="avatar" style="background: #e0e0e0; color: #999;">小</div>
-            <div class="item-info">
-              <div class="item-name-row">
-                <span class="item-name">小可</span>
-              </div>
-              <div class="item-desc">6871263222</div>
-            </div>
-          </div>
-        </div>
       </div>
 
       <div class="bottom-area" id="share-btn-area">
@@ -560,10 +501,16 @@ function resetSharePage() {
   inputValue = '';
   document.getElementById('input-text').textContent = '邮箱/手机号/小米账号';
   document.getElementById('input-box').classList.remove('has-value');
-  document.getElementById('contact-title').style.display = '';
-  document.getElementById('contact-list').style.display = '';
+  setContactListDisplay('');
   document.getElementById('share-btn-area').style.bottom = '34px';
   hideKeyboard();
+}
+
+function setContactListDisplay(val) {
+  const t = document.getElementById('contact-title');
+  const l = document.getElementById('contact-list');
+  if (t) t.style.display = val;
+  if (l) l.style.display = val;
 }
 
 function showToast(pageId, msg) {
@@ -592,16 +539,14 @@ function selectPermission(el) {
 function showKeyboard() {
   document.getElementById('keyboard').classList.add('show');
   document.getElementById('share-btn-area').style.bottom = '280px';
-  document.getElementById('contact-title').style.display = 'none';
-  document.getElementById('contact-list').style.display = 'none';
+  setContactListDisplay('none');
 }
 
 function hideKeyboard() {
   document.getElementById('keyboard').classList.remove('show');
   document.getElementById('share-btn-area').style.bottom = '34px';
   if (!inputValue) {
-    document.getElementById('contact-title').style.display = '';
-    document.getElementById('contact-list').style.display = '';
+    setContactListDisplay('');
   }
 }
 
@@ -618,8 +563,7 @@ function backspace() {
 function clearInput() {
   inputValue = '';
   updateInput();
-  document.getElementById('contact-title').style.display = '';
-  document.getElementById('contact-list').style.display = '';
+  setContactListDisplay('');
 }
 
 function updateInput() {
