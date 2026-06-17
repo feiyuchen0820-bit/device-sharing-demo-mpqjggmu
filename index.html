@@ -141,6 +141,32 @@ body { font-family: -apple-system, "MiSans", "PingFang SC", sans-serif; backgrou
 .info-value .arrow { color: #ccc; }
 .btn-remove { width: calc(100% - 40px); margin: 0 20px; padding: 16px; background: #f5f5f5; color: #FF3B30; border: none; border-radius: 28px; font-size: 16px; font-weight: 500; cursor: pointer; }
 .btn-remove:active { background: #eee; }
+
+/* Family List Page (grouped cards) */
+#page-family-list { background: #f4f4f5; }
+#page-family-list .page-content { padding-bottom: 40px; }
+.fl-plus { font-size: 24px; color: #333; line-height: 1; }
+.fl-top { padding: 6px 20px 14px; }
+.fl-home-name { font-size: 24px; font-weight: 700; color: #000; display: flex; align-items: center; gap: 6px; }
+.fl-chev { font-size: 16px; color: #888; font-weight: 400; }
+.fl-home-sub { font-size: 13px; color: #999; margin-top: 8px; }
+.fl-section { font-size: 13px; color: #8a8a8e; padding: 18px 20px 8px; }
+.fl-card { background: #fff; border-radius: 14px; margin: 0 16px; overflow: hidden; }
+.fl-row { display: flex; align-items: center; padding: 14px 16px; cursor: pointer; }
+.fl-row:active { background: #f5f5f5; }
+.fl-row + .fl-row { border-top: 0.5px solid #f0f0f0; }
+.fl-avatar { width: 40px; height: 40px; border-radius: 50%; margin-right: 12px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 15px; font-weight: 600; flex-shrink: 0; }
+.fl-mem-info { flex: 1; min-width: 0; }
+.fl-mem-name { font-size: 16px; font-weight: 500; color: #000; }
+.fl-mem-role { font-size: 13px; color: #999; margin-top: 2px; }
+.fl-arrow { color: #c7c7cc; font-size: 16px; }
+.fl-add-icon { width: 40px; height: 40px; border-radius: 50%; background: #f0f0f0; margin-right: 12px; display: flex; align-items: center; justify-content: center; color: #888; font-size: 22px; flex-shrink: 0; }
+.fl-srow { display: flex; align-items: center; justify-content: space-between; padding: 15px 16px; cursor: pointer; }
+.fl-srow:active { background: #f5f5f5; }
+.fl-srow + .fl-srow { border-top: 0.5px solid #f0f0f0; }
+.fl-srow .k { font-size: 16px; color: #000; }
+.fl-srow .v { font-size: 14px; color: #999; display: flex; align-items: center; gap: 4px; text-align: right; max-width: 58%; justify-content: flex-end; }
+.fl-srow .v .arrow { color: #c7c7cc; flex-shrink: 0; }
 </style>
 </head>
 <body>
@@ -366,7 +392,7 @@ body { font-family: -apple-system, "MiSans", "PingFang SC", sans-serif; backgrou
           </div>
         </div>
         <div class="nav-bar">
-          <span class="back" onclick="goToPage('page-main')">←</span>
+          <span class="back" onclick="goToPage(memberFrom)">←</span>
           <span class="title">成员信息</span>
           <span class="edit" style="visibility:hidden;">✎</span>
         </div>
@@ -452,55 +478,70 @@ body { font-family: -apple-system, "MiSans", "PingFang SC", sans-serif; backgrou
         </div>
         <div class="nav-bar">
           <span class="back" onclick="goToPage('page-main')">←</span>
-          <span class="title">家庭成员</span>
-          <span class="edit" style="visibility:hidden;">✎</span>
+          <span class="title"></span>
+          <span class="edit fl-plus" onclick="showToast('page-family-list','添加')">+</span>
         </div>
 
-        <div class="section-title">家庭成员（3）</div>
-
-        <div class="list-item">
-          <div class="avatar" style="background: linear-gradient(135deg, #34C759, #2AA84A);">帆</div>
-          <div class="item-info">
-            <div class="item-name-row">
-              <span class="item-name">帆先生</span>
-              <span class="tag" style="background:#E8F8EE;color:#2AA84A;">户主 · 我</span>
-            </div>
-            <div class="item-desc">家庭创建者，拥有全部权限</div>
-          </div>
-          <span class="entry-arrow">›</span>
-        </div>
-        <div class="separator"></div>
-        <div class="list-item" onclick="goToMember('hahaha')">
-          <div class="avatar" style="background: linear-gradient(135deg, #F59E0B, #EF4444);">哈</div>
-          <div class="item-info">
-            <div class="item-name-row">
-              <span class="item-name">哈哈哈</span>
-              <span class="tag" style="background:#FFF3E0;color:#F57C00;">管理员</span>
-            </div>
-            <div class="item-desc">默认允许控制设备</div>
-          </div>
-          <span class="entry-arrow">›</span>
-        </div>
-        <div class="separator"></div>
-        <div class="list-item" onclick="goToMember('aibi')">
-          <div class="avatar" style="background: linear-gradient(135deg, #8B5CF6, #6366F1);">艾</div>
-          <div class="item-info">
-            <div class="item-name-row">
-              <span class="item-name">艾比</span>
-              <span class="tag" style="background:#f0f0f0;color:#999;">成员</span>
-            </div>
-            <div class="item-desc">默认仅可查看设备</div>
-          </div>
-          <span class="entry-arrow">›</span>
+        <div class="fl-top">
+          <div class="fl-home-name">Jerry的家庭 <span class="fl-chev">⌄</span></div>
+          <div class="fl-home-sub">15个房间 · 96个设备</div>
         </div>
 
-        <div class="section-title">添加</div>
-        <div class="entry-item" onclick="showToast('page-family-list', '邀请家人加入家庭')">
-          <div class="entry-icon" style="background:#f0f0f0;">
-            <svg viewBox="0 0 24 24" fill="#666"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+        <div class="fl-section">家庭成员 (3)</div>
+        <div class="fl-card">
+          <div class="fl-row" onclick="goToMember('jerry')">
+            <div class="fl-avatar" style="background:linear-gradient(135deg,#F6B73C,#E58A2E);">J</div>
+            <div class="fl-mem-info">
+              <div class="fl-mem-name">Jerry</div>
+              <div class="fl-mem-role">家庭创建者</div>
+            </div>
+            <span class="fl-arrow">›</span>
           </div>
-          <span class="entry-text">添加成员</span>
-          <span class="entry-arrow">›</span>
+          <div class="fl-row" onclick="goToMember('tom')">
+            <div class="fl-avatar" style="background:linear-gradient(135deg,#6FB1E0,#3B7DBF);">T</div>
+            <div class="fl-mem-info">
+              <div class="fl-mem-name">Tom</div>
+              <div class="fl-mem-role">管理员</div>
+            </div>
+            <span class="fl-arrow">›</span>
+          </div>
+          <div class="fl-row" onclick="goToMember('aibi')">
+            <div class="fl-avatar" style="background:linear-gradient(135deg,#8B5CF6,#6366F1);">艾</div>
+            <div class="fl-mem-info">
+              <div class="fl-mem-name">艾比</div>
+              <div class="fl-mem-role">成员</div>
+            </div>
+            <span class="fl-arrow">›</span>
+          </div>
+          <div class="fl-row" onclick="showToast('page-family-list','邀请家人加入家庭')">
+            <div class="fl-add-icon">+</div>
+            <div class="fl-mem-info">
+              <div class="fl-mem-name" style="color:#333;">邀请家人</div>
+            </div>
+            <span class="fl-arrow">›</span>
+          </div>
+        </div>
+
+        <div class="fl-section">家庭</div>
+        <div class="fl-card">
+          <div class="fl-srow" onclick="showToast('page-family-list','家庭名称')">
+            <span class="k">家庭名称</span><span class="v">Jerry的家庭 <span class="arrow">›</span></span>
+          </div>
+          <div class="fl-srow" onclick="showToast('page-family-list','家庭位置')">
+            <span class="k">家庭位置</span><span class="v">北京市海淀区柳浪家园 <span class="arrow">›</span></span>
+          </div>
+          <div class="fl-srow" onclick="showToast('page-family-list','房间管理')">
+            <span class="k">房间管理</span><span class="v"><span class="arrow">›</span></span>
+          </div>
+          <div class="fl-srow" onclick="showToast('page-family-list','终端设备管理')">
+            <span class="k">终端设备管理</span><span class="v"><span class="arrow">›</span></span>
+          </div>
+          <div class="fl-srow" onclick="showToast('page-family-list','终端家庭屏保')">
+            <span class="k">终端家庭屏保</span><span class="v"><span class="arrow">›</span></span>
+          </div>
+          <div class="fl-srow" onclick="showToast('page-family-list','家庭壁纸')">
+            <span class="k">家庭壁纸</span><span class="v"><span class="arrow">›</span></span>
+          </div>
         </div>
       </div>
 
@@ -513,8 +554,29 @@ body { font-family: -apple-system, "MiSans", "PingFang SC", sans-serif; backgrou
 <script>
 let inputValue = '';
 let fromPage = 'page-main';
+let memberFrom = 'page-main';
 
 const memberData = {
+  jerry: {
+    name: 'Jerry',
+    avatar: 'J',
+    avatarBg: 'linear-gradient(135deg, #F6B73C, #E58A2E)',
+    join: '家庭创建者',
+    id: '10086001',
+    nick: 'Jerry',
+    remark: 'Jerry',
+    role: '户主'
+  },
+  tom: {
+    name: 'Tom',
+    avatar: 'T',
+    avatarBg: 'linear-gradient(135deg, #6FB1E0, #3B7DBF)',
+    join: '2025-03-20 由 Jerry 邀请加入家庭',
+    id: '1562830291',
+    nick: 'Tom',
+    remark: 'Tom',
+    role: '管理员'
+  },
   aibi: {
     name: '艾比',
     avatar: '艾',
@@ -539,6 +601,7 @@ const memberData = {
 
 function goToMember(key) {
   const data = memberData[key];
+  memberFrom = document.querySelector('.page.active').id;
   document.getElementById('member-avatar').textContent = data.avatar;
   document.getElementById('member-avatar').style.background = data.avatarBg;
   document.getElementById('member-name').textContent = data.name;
