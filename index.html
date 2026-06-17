@@ -214,8 +214,8 @@ body { font-family: -apple-system, "MiSans", "PingFang SC", sans-serif; backgrou
           </div>
           <span class="item-action" onclick="event.stopPropagation(); goToPage('page-family-list')">管理></span>
         </div>
-        <div class="separator"></div>
-        <div class="list-item">
+        <div class="separator" id="joe-shared-sep"></div>
+        <div class="list-item" id="joe-shared">
           <div class="avatar" style="background: linear-gradient(135deg, #3B82F6, #6366F1);">乔</div>
           <div class="item-info">
             <div class="item-name-row">
@@ -224,7 +224,7 @@ body { font-family: -apple-system, "MiSans", "PingFang SC", sans-serif; backgrou
             </div>
             <div class="item-desc">2023/12/6 允许控制</div>
           </div>
-          <span class="item-action cancel" onclick="event.stopPropagation(); showToast('page-main', '已取消共享')">取消共享</span>
+          <span class="item-action cancel" onclick="event.stopPropagation(); cancelShare()">取消共享</span>
         </div>
 
         <div class="section-title">去共享</div>
@@ -247,15 +247,17 @@ body { font-family: -apple-system, "MiSans", "PingFang SC", sans-serif; backgrou
 
         <div class="section-title">最近联系人</div>
 
-        <div class="list-item" onclick="showPermissionModal()">
-          <div class="avatar" style="background: #e0e0e0; color: #999;">小</div>
-          <div class="item-info">
-            <div class="item-name-row">
-              <span class="item-name">小可</span>
+        <div id="recent-list">
+          <div class="list-item" onclick="showPermissionModal()">
+            <div class="avatar" style="background: #e0e0e0; color: #999;">小</div>
+            <div class="item-info">
+              <div class="item-name-row">
+                <span class="item-name">小可</span>
+              </div>
+              <div class="item-desc">6871263222</div>
             </div>
-            <div class="item-desc">6871263222</div>
+            <span class="entry-arrow">›</span>
           </div>
-          <span class="entry-arrow">›</span>
         </div>
       </div>
 
@@ -653,6 +655,32 @@ function showToast(pageId, msg) {
 
 function showPermissionModal() {
   document.getElementById('modal-permission').classList.add('show');
+}
+
+function cancelShare() {
+  const sep = document.getElementById('joe-shared-sep');
+  const row = document.getElementById('joe-shared');
+  if (sep) sep.remove();
+  if (row) row.remove();
+  const list = document.getElementById('recent-list');
+  if (list && !document.getElementById('recent-joe')) {
+    const item = document.createElement('div');
+    item.className = 'list-item';
+    item.id = 'recent-joe';
+    item.setAttribute('onclick', 'showPermissionModal()');
+    item.innerHTML =
+      '<div class="avatar" style="background: linear-gradient(135deg, #3B82F6, #6366F1);">乔</div>' +
+      '<div class="item-info">' +
+        '<div class="item-name-row"><span class="item-name">乔纳森</span></div>' +
+        '<div class="item-desc">6871263111</div>' +
+      '</div>' +
+      '<span class="entry-arrow">›</span>';
+    const sep2 = document.createElement('div');
+    sep2.className = 'separator';
+    list.insertBefore(item, list.firstChild);
+    list.insertBefore(sep2, item.nextSibling);
+  }
+  showToast('page-main', '已取消共享');
 }
 
 function hidePermissionModal() {
